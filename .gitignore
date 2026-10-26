@@ -1,0 +1,8 @@
+build/
+JUCE/
+ARA_SDK/
+*.vst3
+*.component
+build*.log
+.DS_Store
+build-dev/
