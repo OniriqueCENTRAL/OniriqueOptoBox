@@ -1,0 +1,7 @@
+Test project /Users/runner/work/OniriqueOptoBox/OniriqueOptoBox/build
+    Start 1: opto
+1/1 Test #1: opto .............................   Passed    1.69 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   1.71 sec

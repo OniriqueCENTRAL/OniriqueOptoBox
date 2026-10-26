@@ -1,0 +1,2 @@
+OptoBox-macOS-AU.zip
+OptoBox-macOS-VST3.zip

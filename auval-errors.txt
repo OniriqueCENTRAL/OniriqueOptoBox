@@ -1,0 +1,39 @@
+15:* * PASS
+26:* * PASS
+50:* * PASS
+54:* * PASS
+58:    PASS
+60:    PASS
+62:    PASS
+64:* * PASS
+68:* * PASS
+75:    PASS
+81:    PASS
+84:    PASS
+86:* * PASS
+101:  -parameter PASS
+108:  -parameter PASS
+119:  -parameter PASS
+130:  -parameter PASS
+137:  -parameter PASS
+144:  -parameter PASS
+151:  -parameter PASS
+163:  -parameter PASS
+170:  -parameter PASS
+177:  -parameter PASS
+184:  -parameter PASS
+196:  -parameter PASS
+199:  PASS
+201:* * PASS
+248:* * PASS
+256:  PASS
+265:  PASS
+269:  PASS
+272:  PASS
+277:  PASS
+280:  PASS
+285:  PASS
+288:  PASS
+291:  PASS
+293:* * PASS
+295:AU VALIDATION SUCCEEDED.
