@@ -14,12 +14,17 @@ namespace
 
 OptoBoxEditor::OptoBoxEditor (OptoBoxProcessor& p)
     : AudioProcessorEditor (p), processor (p), faceplate (p),
-      bar (p.presets, p.apvts, "OPTOBOX", ImageCache::getFromMemory (BinaryData::sigil_png, BinaryData::sigil_pngSize), kWidth, kWidth)
+      bar (p.presets, p.apvts, "OPTOBOX", ImageCache::getFromMemory (BinaryData::sigil_png, BinaryData::sigil_pngSize), kUnits, kUnits)
 {
     setLookAndFeel (&look);
     addAndMakeVisible (faceplate);
     addAndMakeVisible (bar);
-    jassert (nuit::Bar::heightFor (kWidth) == kBarHeight);
+    bar.onThemeChanged = [this] { themeSeen = -1; };
+    glowLayer.setInterceptsMouseClicks (false, false);
+    faceplate.addAndMakeVisible (glowLayer);
+    watch.tick = [this] { watchTick(); };
+    watch.startTimerHz (30);
+    jassert (nuit::Bar::heightFor (kUnits) == kBarHeight);
 
     tooltips = std::make_unique<TooltipWindow> (this, 1200);
 
@@ -28,13 +33,13 @@ OptoBoxEditor::OptoBoxEditor (OptoBoxProcessor& p)
 
     // The front and its bar keep their proportions; the window grows by zooming them, from 75 to 200 %.
     setResizable (true, true);
-    setResizeLimits (kWidth * 3 / 4, kTotalHeight * 3 / 4, kWidth * 2, kTotalHeight * 2);
-    getConstrainer()->setFixedAspectRatio ((double) kWidth / (double) kTotalHeight);
+    setResizeLimits (kUnits * 3 / 4, kTotalHeight * 3 / 4, kUnits * 2, kTotalHeight * 2);
+    getConstrainer()->setFixedAspectRatio ((double) kUnits / (double) kTotalHeight);
 
     // taille d'ouverture : la règle commune des plugins ONIRIQUE (ui/OniriqueWindowSize.h)
-    const auto opening = onirique::window::openingSize ({}, kWindowName, { kWidth, kTotalHeight },
-                                                        { kWidth * 3 / 4, kTotalHeight * 3 / 4 }, { kWidth * 2, kTotalHeight * 2 });
-    setSize (opening.x, opening.x * kTotalHeight / kWidth);
+    const auto opening = onirique::window::openingSize ({}, kWindowName, { kUnits, kTotalHeight },
+                                                        { kUnits * 3 / 4, kTotalHeight * 3 / 4 }, { kUnits * 2, kTotalHeight * 2 });
+    setSize (opening.x, opening.x * kTotalHeight / kUnits);
 }
 
 OptoBoxEditor::~OptoBoxEditor()
@@ -45,14 +50,19 @@ OptoBoxEditor::~OptoBoxEditor()
 
 void OptoBoxEditor::paint (Graphics& g)
 {
-    g.fillAll (hw::palette::night);
+    const float u = (float) getWidth() / (float) kUnits;
+    if (daBackdrop.getWidth() != getWidth() || daBackdrop.getHeight() != getHeight())
+        daBackdrop = da::backdrop (getWidth(), getHeight(), (float) getWidth() / 1100.0f);
+    g.drawImageAt (daBackdrop, 0, 0);
+    da::photoCard (g, Rectangle<float> ((float) kMargin, (float) (kBarHeight + kMargin), (float) kWidth, (float) kFrontHeight) * u, 14.0f * u, u);
 }
 
 void OptoBoxEditor::resized()
 {
-    const auto scale = (float) getWidth() / (float) kWidth;
+    const auto scale = (float) getWidth() / (float) kUnits;
 
-    faceplate.setBounds (0, kBarHeight, kWidth, kFrontHeight);
+    faceplate.setBounds (kMargin, kBarHeight + kMargin, kWidth, kFrontHeight);
+    glowLayer.setBounds (faceplate.getLocalBounds());
     faceplate.setTransform (AffineTransform::scale (scale));
 
     // The licence badge has its place in the bar, beside the menu.
@@ -113,6 +123,38 @@ void OptoBoxEditor::Look::drawTooltip (Graphics& g, const String& text, int widt
     g.drawRoundedRectangle (bounds, 10.0f, 1.0f);
 
     layoutFor (text, kTipWidth).draw (g, bounds.reduced (14.0f, 11.0f));
+}
+
+
+/** La couleur de l'interface suivie, et la lueur qui s'allume en douceur sur la commande survolée. */
+void OptoBoxEditor::watchTick()
+{
+    if (onirique::look::changedSince (themeSeen))
+    {
+        faceplate.themeChanged();
+        daBackdrop = {};
+        repaint();
+    }
+
+    auto* under = Desktop::getInstance().getMainMouseSource().getComponentUnderMouse();
+    const bool over = under != nullptr && under != &faceplate && under != &glowLayer && faceplate.isParentOf (under)
+                      && (dynamic_cast<Slider*> (under) != nullptr || dynamic_cast<Button*> (under) != nullptr);
+
+    if (over)
+        glowLayer.target = faceplate.getLocalArea (under, under->getLocalBounds()).toFloat();
+
+    const float target = over ? 1.0f : 0.0f;
+
+    if (std::abs (glowLayer.amount - target) > 0.01f)
+    {
+        glowLayer.amount += (target - glowLayer.amount) * 0.3f;
+        glowLayer.repaint();
+    }
+    else if (glowLayer.amount != target)
+    {
+        glowLayer.amount = target;
+        glowLayer.repaint();
+    }
 }
 
 } // namespace onirique

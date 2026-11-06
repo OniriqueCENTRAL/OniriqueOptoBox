@@ -2,6 +2,7 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "../../License/OniriqueTheme.h"
 
 namespace onirique::hw
 {
@@ -14,13 +15,21 @@ using namespace juce;
 namespace palette
 {
     inline const Colour night     { 0xff0d0809 };
-    inline const Colour plateTop  { 0xff6e0c19 };
-    inline const Colour plate     { 0xff5c0812 };
-    inline const Colour plateLow  { 0xff46050d };
+    // la peinture du panneau : rouge ONIRIQUE, ou la couleur de l'interface choisie (refreshPalette)
+    inline Colour plateTop  { 0xff6e0c19 };
+    inline Colour plate     { 0xff5c0812 };
+    inline Colour plateLow  { 0xff46050d };
     inline const Colour ink       { 0xfffff0f1 };    // the silkscreen
-    inline const Colour ember     { 0xffe23444 };
-    inline const Colour deep2     { 0xff2a0a0e };
+    inline const Colour& ember = onirique::look::emberBar;
+    inline const Colour& deep2 = onirique::look::deepTint2;
     inline const Colour mist      { 0xfff6eeee };
+
+    inline void refreshPalette()
+    {
+        plateTop = onirique::look::tint (0xff6e0c19);
+        plate = onirique::look::tint (0xff5c0812);
+        plateLow = onirique::look::tint (0xff46050d);
+    }
 }
 
 /** The sans-serif of the silkscreen, named outright: the "default" placeholder

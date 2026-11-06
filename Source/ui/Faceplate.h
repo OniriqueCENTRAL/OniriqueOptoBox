@@ -25,6 +25,9 @@ public:
     void paint (Graphics&) override;
     void paintOverChildren (Graphics&) override;
 
+    /** La couleur de l'interface a changé : la peinture du panneau est recalculée. */
+    void themeChanged() { hw::palette::refreshPalette(); panel = {}; repaint(); }
+
     void mouseMove (const MouseEvent&) override;
     void mouseDown (const MouseEvent&) override;
 
