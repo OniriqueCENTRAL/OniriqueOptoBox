@@ -20,8 +20,7 @@ OptoBoxEditor::OptoBoxEditor (OptoBoxProcessor& p)
     addAndMakeVisible (faceplate);
     addAndMakeVisible (bar);
     bar.onThemeChanged = [this] { themeSeen = -1; };
-    glowLayer.setInterceptsMouseClicks (false, false);
-    faceplate.addAndMakeVisible (glowLayer);
+    glowLayer.setInterceptsMouseClicks (false, false);   // la lueur au survol est retirée (demande de Nov) : la couche reste invisible
     watch.tick = [this] { watchTick(); };
     watch.startTimerHz (30);
     jassert (nuit::Bar::heightFor (kUnits) == kBarHeight);
