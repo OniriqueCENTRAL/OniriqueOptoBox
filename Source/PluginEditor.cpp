@@ -138,7 +138,8 @@ void OptoBoxEditor::watchTick()
 
     auto* under = Desktop::getInstance().getMainMouseSource().getComponentUnderMouse();
     const bool over = under != nullptr && under != &faceplate && under != &glowLayer && faceplate.isParentOf (under)
-                      && (dynamic_cast<Slider*> (under) != nullptr || dynamic_cast<Button*> (under) != nullptr);
+                      && dynamic_cast<Slider*> (under) != nullptr                       // seulement les potards
+                      && ! ModifierKeys::currentModifiers.isAnyMouseButtonDown();         // et pas pendant qu'on les tourne
 
     if (over)
         glowLayer.target = faceplate.getLocalArea (under, under->getLocalBounds()).toFloat();
